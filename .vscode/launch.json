@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug DOCKER server",
+      "type": "node",
+      "restart": true,
+      "request": "attach",
+      "port": 9229,
+      "address": "127.0.0.1",
+      "remoteRoot": "/home/src/app/src",
+      "localRoot": "${workspaceFolder}/src"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start DOCKER Development server",
+			"type": "shell",
+			"command": "docker-compose -f ${workspaceFolder}/development/dev.docker-compose.yml up -d"
+		},
+		{
+			"label": "Stop DOCKER Development server",
+			"type": "shell",
+			"command": "docker-compose -f ${workspaceFolder}/development/dev.docker-compose.yml down"
+		},
+		{
+			"label": "Build DOCKER Development server",
+			"type": "shell",
+			"command": "docker-compose -f ${workspaceFolder}/development/dev.docker-compose.yml build"
+		},
+		{
+			"label": "Build DOCKER Development server and start",
+			"type": "shell",
+			"command": "docker-compose -f ${workspaceFolder}/development/dev.docker-compose.yml up --build -d"
+		},
+		{
+			"label": "DELETE DOCKER CACHE",
+			"type": "shell",
+			"command": "docker system prune -a -f"
+		},
+		{
+			"label": "Re-build and start DOCKER Development server",
+			"type": "shell",
+			"command": "docker-compose -f ${workspaceFolder}/development/dev.docker-compose.yml down; docker-compose -f ${workspaceFolder}/development/dev.docker-compose.yml up --build -d"
+		}
+	]
+}

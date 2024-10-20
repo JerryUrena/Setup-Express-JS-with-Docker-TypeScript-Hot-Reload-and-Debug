@@ -1,0 +1,28 @@
+{
+  "name": "myapp",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "buildDev": "rimraf build && tsc -p development/dev.tsconfig.json",
+    "startDev": "rimraf build && tsc -p development/dev.tsconfig.json && nodemon --config development/nodemon.json --inspect src/index.ts",
+    "buildAndStartDev": "npm run buildDev && npm run startDev",
+    "buildProd": "rimraf build && tsc -p .",
+    "startProd": "node build/index.js",
+    "buildAndStartProd": "npm run buildProd && npm run startProd",
+    "startDockerDev": "nodemon --config development/nodemon.json --inspect=0.0.0.0:9229 src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "nodemon": "^3.1.7",
+    "rimraf": "^6.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
+  }
+}

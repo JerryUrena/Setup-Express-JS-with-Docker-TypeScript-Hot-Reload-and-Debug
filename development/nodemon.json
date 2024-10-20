@@ -1,0 +1,18 @@
+{
+  "verbose": true,
+  "restartable": "rs",
+  "legacyWatch": true,
+  "ignore": [
+    ".git",
+    "node_modules",
+    "build",
+    "development"
+  ],
+  "watch": [
+    "src"
+  ],
+  "execMap": {
+    "ts": "node -r ts-node/register"
+  },
+  "ext": "ts,js"
+}

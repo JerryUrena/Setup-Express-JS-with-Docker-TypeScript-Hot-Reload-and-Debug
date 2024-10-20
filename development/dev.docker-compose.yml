@@ -1,0 +1,15 @@
+services:
+  server:
+    build:
+      context: ../
+      dockerfile: development/dev.Dockerfile
+    container_name: "${APP_NAME}-${APP_VERSION}"
+    volumes:
+      - ../src:/home/src/app/src
+    restart: always
+    environment:
+      PORT: "80"
+    ports:
+      - "9229:9229" # Debugger port
+      - "${PORT}:80"
+    command: npm run startDockerDev
