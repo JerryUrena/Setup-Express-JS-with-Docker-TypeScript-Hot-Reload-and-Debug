@@ -1,307 +1,270 @@
-This project gives you a clean setup for an Express.js server using TypeScript and Docker, with hot-reloading and easy debugging. It ensures everything runs consistently across different environments and platforms.
-#
-#
-
 ## Requirements
 
-- Install the latest version of Node.js from [here](https://nodejs.org/en/download/package-manager).
-- Verify the installation with:
+- **Node.js**: Download and install the latest version of Node.js [here](https://nodejs.org/en/download/package-manager). Verify your installation:
   ```bash
   node --version
   ```
 
-- Install the latest version of Docker from [here](https://docs.docker.com/get-started/get-docker).
-- Open Docker Desktop and verify that it's running.
-- Verify that Docker is ready with:
-```bash
-docker info
-```
+- **Docker**: Download and install the latest version of Docker [here](https://docs.docker.com/get-started/get-docker). Open Docker Desktop and verify that it's running:
+  ```bash
+  docker info
+  ```
 
-- Install the lastest version of Visual studio code from [here](https://code.visualstudio.com/)
+- **Visual Studio Code**: Download and install the latest version from [here](https://code.visualstudio.com/).
+
+- **GIT**: Download and install the latest version from [here](https://git-scm.com/downloads).
+
+- **Project Repository**: Clone the initial repository from [here](https://github.com/JerryUrena/Setup-Express-JS-with-Docker-TypeScript-Hot-Reload-and-Debug)
+```bash
+git clone https://github.com/JerryUrena/Setup-Express-JS-with-Docker-TypeScript-Hot-Reload-and-Debug
+```
 
 ---
 
 ## 1. Initialize the Project
 
- **Create a project directory**:
-   ```bash
-   mkdir myapp && cd myapp
-   ```
+### Initialize Node modules:
 
-**Initialize Node.js**:
-   ```bash
-   npm init -y
-   ```
+This project uses `npm` to manage dependencies. Navigate to your project directory and install the dependencies:
+```bash
+cd myapp && npm install
+```
 
----
+### Install additional dev dependencies:
 
-## 2. Install Dependencies
+To ensure TypeScript definitions are available, install the following dev dependencies:
+```bash
+npm install -D @types/cors @types/node
+```
 
-**Install Express**:
-   ```bash
-   npm install express
-   ```
+### Install runtime dependencies:
 
-**Install Dev Dependencies**:
-   ```bash
-   npm install -D @types/express typescript nodemon ts-node rimraf
-   ```
-
----
-
-## 3. Configure TypeScript
-
-**Initialize TypeScript configuration**:
-   ```bash
-   npx tsc --init
-   ```
-
-**Update `tsconfig.json`**:
-   ```json
-   {
-     "include": [
-       "./src/**/*.ts",
-       "./src/**/*.js"
-     ],
-     "compilerOptions": {
-       "baseUrl": ".",
-       "outDir": "build",
-       "rootDir": "src",
-       "target": "es6",
-       "module": "commonjs",
-       "lib": ["es6"],
-       "allowJs": false,
-       "strict": true,
-       "noImplicitAny": true,
-       "esModuleInterop": true,
-       "skipLibCheck": true,
-       "removeComments": true,
-       "resolveJsonModule": true,
-       "forceConsistentCasingInFileNames": true,
-       "experimentalDecorators": true,
-       "emitDecoratorMetadata": true
-     },
-     "exclude": [
-       "node_modules/*"
-     ]
-   }
-   ```
-
----
-
-## 4. Setup Express
-
-**Create the project structure**:
-   ```bash
-   mkdir src
-   ```
-
-**Create a basic Express server**:
-- Inside the src directory create an `index.ts` file and add the following code.
-   ```ts
-   import express, { Request, Response } from 'express';
-
-   const app = express();
-   const PORT = process.env.PORT || 3000;
-
-   app.get('/', (req: Request, res: Response) => {
-     res.send('Hello from Express and TypeScript!').end();
-   });
-
-   app.listen(PORT, () => {
-     console.log(`Server is running on port ${PORT}`);
-   });
-   ```
-
----
-
-## 5. Set Up Development Environment
-
-**Create the `development` directory**:
-   ```bash
-   mkdir development
-   ```
-
-### 5.1 Nodemon Configuration
-
-**Create `nodemon.json`**:
-Create a file `nodemon.json` inside the development folder and add the following code:
-   ```json
-   {
-     "verbose": true,
-     "restartable": "rs",
-     "legacyWatch": true,
-     "ignore": [".git", "node_modules", "build", "development"],
-     "watch": ["src"],
-     "execMap": {
-       "ts": "node -r ts-node/register"
-     },
-     "ext": "ts,js"
-   }
-   ```
-
-### 5.2 TypeScript Development Config
-
-**Create `dev.tsconfig.json`**:
-Create a file `dev.tsconfig.json` inside the development folder and add the following code:
-   ```json
-   {
-     "extends": "../tsconfig",
-     "compileOnSave": true,
-     "compilerOptions": {
-       "sourceMap": true,
-       "strictNullChecks": true
-     }
-   }
-   ```
-
-### 5.3 Environment Variables
-
-**Create `.env`**:
-Create a file `.env` inside the development folder and add the following code:
-   ```text
-   # General envs
-   APP_NAME=Example
-   PORT=80
-   PRODUCTION=0
-   APP_VERSION=1.0.0
-   ```
-
----
-
-## 6. Docker Setup
-
-**Create the Dockerfile for development**:
-Create a file `dev.Dockerfile` inside the development folder and add the following code:
-
-   ```Dockerfile
-   # Stage 1: Build
-   FROM node:23
-
-   WORKDIR /home/src/app
-
-   COPY package*.json .
-
-   RUN npm install
-
-   COPY tsconfig.json .
-   COPY development/nodemon.json ./development/nodemon.json
-   COPY development/dev.tsconfig.json ./development/dev.tsconfig.json
-   ```
-
-**Create Docker Compose for development**:
-Create a file `dev.docker-compose.yml` inside the development folder and add the following code:
-   ```yaml
-   services:
-     server:
-       build:
-         context: ../
-         dockerfile: development/dev.Dockerfile
-       container_name: "${APP_NAME}-${APP_VERSION}"
-       volumes:
-         - ../src:/home/src/app/src
-       restart: always
-       environment:
-         PORT: "80"
-       ports:
-         - "9229:9229" # Debugger port
-         - "${PORT}:80"
-       command: npm run startDockerDev
-   ```
-
----
-
-## 7. Update Scripts in `package.json`
-
-**Replace default scripts**:
-   ```json
-   {
-     "buildDev": "rimraf build && tsc -p development/dev.tsconfig.json",
-     "startDev": "rimraf build && tsc -p development/dev.tsconfig.json && nodemon --config development/nodemon.json --inspect src/index.ts",
-     "buildAndStartDev": "npm run buildDev && npm run startDev",
-     "buildProd": "rimraf build && tsc -p .",
-     "startProd": "node build/index.js",
-     "buildAndStartProd": "npm run buildProd && npm run startProd",
-     "startDockerDev": "nodemon --config development/nodemon.json --inspect=0.0.0.0:9229 src/index.ts"
-   }
-   ```
-
----
-
-## 8. Debugging Setup
-- Create a new directory: `.vscode` in the root directory
-
-**Configure VS Code Debugging**:
-Create a file `launch.json` inside the .vscode folder and add the following code:
-   ```json
-   {
-     "version": "0.2.0",
-     "configurations": [
-       {
-         "name": "Debug DOCKER server",
-         "type": "node",
-         "restart": true,
-         "request": "attach",
-         "port": 9229,
-         "address": "127.0.0.1",
-         "remoteRoot": "/home/src/app/src",
-         "localRoot": "${workspaceFolder}/src"
-       }
-     ]
-   }
-   ```
-
----
-
-## 9. Visual Studio Code Tasks
-
-**Create VS Code tasks**:
-Create a file `tasks.json` inside the .vscode folder and add the following code:
-
-```json
-  {
-    "version": "2.0.0",
-    "tasks": [
-      {
-        "label": "Start DOCKER Development server",
-        "type": "shell",
-        "command": "docker-compose -f ${workspaceFolder}/development/dev.docker-compose.yml up -d"
-      },
-      {
-        "label": "Stop DOCKER Development server",
-        "type": "shell",
-        "command": "docker-compose -f ${workspaceFolder}/development/dev.docker-compose.yml down"
-      },
-      {
-        "label": "Build DOCKER Development server",
-        "type": "shell",
-        "command": "docker-compose -f ${workspaceFolder}/development/dev.docker-compose.yml build"
-      },
-      {
-        "label": "Build DOCKER Development server and start",
-        "type": "shell",
-        "command": "docker-compose -f ${workspaceFolder}/development/dev.docker-compose.yml up --build -d"
-      },
-      {
-        "label": "DELETE DOCKER CACHE",
-        "type": "shell",
-        "command": "docker system prune -a -f"
-      },
-      {
-        "label": "Re-build and start DOCKER Development server",
-        "type": "shell",
-        "command": "docker-compose -f ${workspaceFolder}/development/dev.docker-compose.yml down; docker-compose -f ${workspaceFolder}/development/dev.docker-compose.yml up --build -d"
-    }
-	]
-}
+These dependencies are necessary for Dependency Injection and other features in this project:
+```bash
+npm install tsyringe cors reflect-metadata
 ```
 
 ---
 
-## 10. Running the Project
-If you made it this far then your project is successfully configured and ready to be tested.
+## 2. Project Structure
 
-**Build and Start**:
-   - In Visual Studio Code, open terminal/tasks and run the task named: `Build DOCKER Development server and start`
-   - Wait for the docker-compose image to finish building.
-   - Visit the server at: [http://localhost](http://localhost)
+Here's a breakdown of the project's structure inside the `src` directory:
+
+```
+src/
+├── Controllers/
+│   └── homeController.ts
+├── Models/
+│   └── responseModel.ts
+├── Routes/
+│   ├── homeRoutes.ts
+│   └── index.ts
+└── index.ts
+```
+
+### Explanation:
+
+- **Controllers**: This folder contains the logic that processes incoming requests. For example, `homeController.ts` handles requests for a specific route (e.g., `/test`).
+- **Models**: Contains data models, such as `responseModel.ts`, which defines the structure of the responses returned by the API.
+- **Routes**: This folder manages the routing of HTTP requests. It delegates requests to the appropriate controllers.
+- **index.ts**: The main entry point of the application that initializes Express and configures middleware.
+
+---
+
+## 3. Configure the Project
+
+### 3.1 `src/index.ts`
+
+This is the main entry point of the application. It defines the `Server` class which encapsulates the entire Express configuration, middleware setup, routing, and error handling.
+
+```ts
+import express, { Application } from "express";
+import cors, { CorsOptions } from "cors";
+import Routes from "./Routes";
+import { IResponseModel } from "./Models/responseModel";
+
+export default class Server {
+  app: Application;
+
+  constructor() {
+    this.app = express(); // Initialize Express app instance
+    this.config();        // Configure app settings
+    new Routes(this.app); // Set up routing by initializing the Routes class
+  }
+
+  // This method configures middleware like CORS
+  private config(): void {
+    const corsOptions: CorsOptions = {
+      credentials: true,
+      origin: "*",         // Allow any origin
+      methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH'] // Allowed HTTP methods
+    };
+    this.app.use(cors(corsOptions)); // Apply CORS middleware
+  }
+
+  // Start the server and set up global error handlers
+  public start(): void {
+    const host: string = process.env.HOST || "0.0.0.0";
+    const port: number = process.env.PORT ? Number(process.env.PORT) : 80;
+    console.log(`Server running at ${host}:${port}`);
+
+    this.app.listen(port, host); // Start the Express server
+
+    // Attach global error handling events for server errors
+    this.app.on('error', (error) => this.errorHandler(error));
+    this.app.on('uncaughtException', (error) => this.errorHandler(error));
+  }
+
+  // Custom error handler to return a consistent error response model
+  private errorHandler(err: any): IResponseModel {
+    return {
+      message: "Invalid URL or Method",
+      status: 500,
+      success: false
+    };
+  }
+}
+
+new Server().start(); // Create a new instance of the server and start it
+```
+
+### Explanation:
+
+- **Server Class**: Encapsulates the server setup using OOP. The constructor configures middleware and sets up routes.
+- **CORS Configuration**: Allows cross-origin requests by setting headers and configuring allowed HTTP methods.
+- **Error Handling**: The `errorHandler` method captures and formats server errors into a standardized response format.
+
+---
+
+### 3.2 `src/Routes/index.ts`
+
+This file is responsible for initializing and managing all the routes in the application. It also handles common error responses, such as returning 404 errors for invalid paths.
+
+```ts
+import { Application, Request, Response } from "express";
+import { IResponseModel } from '../Models/responseModel';
+import HomeRoutes from './homeRoutes';
+
+export default class Routes {
+  constructor(app: Application) {
+    app.use("/", HomeRoutes); // Register the HomeRoutes for root-level requests
+
+    const errorResponse: IResponseModel = {
+      message: "Invalid URL or Method",
+      status: 404,
+      success: false
+    };
+
+    // Handle all unmatched GET requests (404 errors)
+    app.get('*', (req: Request, res: Response<IResponseModel>) => {
+      res.status(404).json(errorResponse).end();
+    });
+
+    // Handle all unmatched POST requests (404 errors)
+    app.post('*', (req: Request, res: Response<IResponseModel>) => {
+      res.status(404).json(errorResponse).end();
+    });
+  }
+}
+```
+
+### Explanation:
+
+- **Route Initialization**: This class is responsible for initializing and registering all the application's routes.
+- **Error Handling**: Any request that doesn't match the registered routes will receive a `404` error, returning a response defined by `IResponseModel`.
+
+---
+
+### 3.3 `src/Routes/homeRoutes.ts`
+
+The `HomeRoutes` class defines a specific route (`/test`) and leverages Dependency Injection (DI) to inject the `HomeController` using the `tsyringe` library.
+
+```ts
+import { Router } from 'express';
+import 'reflect-metadata';
+import { container } from "tsyringe";
+import HomeController from '../Controllers/homeController';
+
+class HomeRoutes {
+  router: Router;
+  di: HomeController;
+
+  constructor() {
+    this.router = Router();
+    this.di = container.resolve(HomeController); // Dependency Injection: resolve HomeController from container
+
+    // Define the /test route and bind the controller method
+    this.router.get("/test", this.di.index.bind(this.di));
+  }
+}
+
+export default new HomeRoutes().router; // Export an instance of the router to be used in the application
+```
+
+### Explanation:
+
+- **Dependency Injection**: The `container.resolve(HomeController)` allows the injection of `HomeController` via DI. This makes the class loosely coupled and more testable.
+- **Route Definition**: The `/test` route is handled by the `index` method of `HomeController`. The `bind` ensures the method's `this` context remains bound to the controller instance.
+
+---
+
+### 3.4 `src/Controllers/homeController.ts`
+
+This controller handles incoming requests for the `/test` route and sends back a predefined response.
+
+```ts
+import { Request, Response } from "express";
+import { IResponseModel } from "../Models/responseModel";
+import { autoInjectable } from "tsyringe";
+
+@autoInjectable() // Enables automatic Dependency Injection by tsyringe
+class HomeController {
+  // Handles the GET request for /test route
+  public async index(req: Request, res: Response): Promise<void> {
+    const response: IResponseModel = {
+      message: "Hello there!",
+      status: 200,
+      success: true
+    };
+    res.send(response).end(); // Send the response back and end the connection
+  }
+}
+
+export default HomeController;
+```
+
+### Explanation:
+
+- **Controller Logic**: The `HomeController` defines the logic that processes requests to the `/test` route and sends back a JSON response.
+- **Dependency Injection**: The `@autoInjectable()` decorator makes the class injectable, allowing it to be resolved by the DI container.
+
+---
+
+### 3.5 `src/Models/responseModel.ts`
+
+This interface defines the structure of the API responses, ensuring consistent response formats across the application.
+
+```ts
+export interface IResponseModel {
+  success: boolean; // Indicates if the request was successful
+  message: any;     // Contains the main message or data
+  data?: any;       // Optional: Additional data related to the response
+  status: number;   // HTTP status code of the response
+}
+```
+
+### Explanation:
+
+- **Interface Definition**: This model ensures that all API responses follow a consistent format, with fields for success status, message, optional data, and HTTP status code.
+
+---
+
+## 4. Running the Project
+
+Once you have configured the project, you can run it using Docker. Follow these steps:
+
+- Make sure the Docker desktop app is running.
+- Go to terminal / Run Tasks 
+- Run the task named: `Build DOCKER Development server and start`
+
+Wait for Docker to finish building the image and then visit [http://localhost/test](http://localhost/test) to access the server.
