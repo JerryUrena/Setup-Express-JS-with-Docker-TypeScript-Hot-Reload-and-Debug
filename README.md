@@ -100,6 +100,7 @@ export default class Server {
       methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH'] // Allowed HTTP methods
     };
     this.app.use(cors(corsOptions)); // Apply CORS middleware
+    this.app.use(express.json({ limit: '50mb' })); //Accept Json content
   }
 
   // Start the server and set up global error handlers

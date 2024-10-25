@@ -39,6 +39,7 @@ export default class Server
     };
 
     this.app.use(cors(corsOptions));
+    this.app.use(express.json({ limit: '50mb' }));
   }
 
 
