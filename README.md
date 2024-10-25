@@ -305,3 +305,12 @@ If you made it this far then your project is successfully configured and ready t
    - In Visual Studio Code, open terminal/tasks and run the task named: `Build DOCKER Development server and start`
    - Wait for the docker-compose image to finish building.
    - Visit the server at: [http://localhost](http://localhost)
+
+
+## 11. Repository
+- Clone this repo
+```bash
+git clone https://github.com/JerryUrena/Setup-Express-JS-with-Docker-TypeScript-Hot-Reload-and-Debug
+```
+#
+- Found an error? [Edit this Repository on GitHub](https://github.com/JerryUrena/Setup-Express-JS-with-Docker-TypeScript-Hot-Reload-and-Debug)
